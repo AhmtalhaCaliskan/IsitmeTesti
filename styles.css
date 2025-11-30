@@ -207,12 +207,13 @@ body::before {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     letter-spacing: 0.3px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     pointer-events: auto !important;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
     touch-action: manipulation;
+    z-index: 10;
 }
 
 .btn::before {
@@ -225,6 +226,7 @@ body::before {
     background: rgba(255, 255, 255, 0.2);
     transition: left 0.3s ease;
     z-index: 0;
+    pointer-events: none;
 }
 
 .btn:hover::before {
@@ -561,12 +563,13 @@ body::before {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     pointer-events: auto !important;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
     touch-action: manipulation;
+    z-index: 10;
 }
 
 .test-controls .btn::before {
@@ -579,6 +582,7 @@ body::before {
     background: rgba(255, 255, 255, 0.2);
     transition: left 0.3s ease;
     z-index: 0;
+    pointer-events: none;
 }
 
 .test-controls .btn:hover::before {
@@ -925,6 +929,8 @@ button {
     appearance: button;
     -webkit-appearance: button;
     -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    background-clip: padding-box;
 }
 
 button:focus {
@@ -937,6 +943,13 @@ button:focus-visible {
 
 button:active {
     outline: none !important;
+}
+
+/* Mobil uyumlu buton stilleri */
+@supports (touch-action: manipulation) {
+    button {
+        touch-action: manipulation;
+    }
 }
 
 /* Modal Stiller */
@@ -1175,6 +1188,12 @@ button:active {
         width: 100%;
         padding: 14px 20px;
         font-size: 1em;
+        border: none;
+        pointer-events: auto !important;
+    }
+    
+    .test-controls .btn:active {
+        transform: scale(0.95);
     }
     
     /* Sound Indicator */
@@ -1312,6 +1331,12 @@ button:active {
         padding: 12px 16px;
         font-size: 0.95em;
         border-radius: 10px;
+        border: none;
+        pointer-events: auto !important;
+    }
+    
+    .test-controls .btn:active {
+        transform: scale(0.93);
     }
     
     .sound-indicator {

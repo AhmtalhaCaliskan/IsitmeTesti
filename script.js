@@ -219,8 +219,18 @@ function updateTestUI() {
 
 // Kullanıcı "Duydum" butonuna basıyor - İyileştirilmiş
 function onHeard() {
-    // Eğer zaten beklemedeyse veya ses çalmıyorsa yoksay
-    if (state.isWaitingForResponse || !state.isPlaying || state.isPaused) {
+    // Eğer test devam etmiyorsa veya test başlamadıysa yoksay
+    if (state.isPaused || !state.testStarted) {
+        return;
+    }
+    
+    // Eğer ses hala çalmıyorsa ve beklenmiyorsa bu klik hiçbir şey yapmaz
+    if (!state.isPlaying && !state.isWaitingForResponse) {
+        return;
+    }
+    
+    // Eğer zaten bu frekansı işlediyse yoksay
+    if (state.isWaitingForResponse) {
         return;
     }
     
@@ -251,12 +261,17 @@ function onHeard() {
         if (!state.isPaused) {
             runTest();
         }
-    }, 800);
+    }, 300);
 }
 
 // Kullanıcı "Duymadım" butonuna basıyor
 function onNotHeard() {
-    // Eğer zaten beklemedeyse veya ses çalmıyorsa yoksay
+    // Eğer test devam etmiyorsa veya test başlamadıysa yoksay
+    if (state.isPaused || !state.testStarted) {
+        return;
+    }
+    
+    // Eğer zaten bu frekansı işlediyse yoksay
     if (state.isWaitingForResponse) {
         return;
     }
@@ -290,7 +305,7 @@ function onNotHeard() {
         if (!state.isPaused) {
             runTest();
         }
-    }, 600);
+    }, 300);
 }
 
 // Sonuçları göster
@@ -441,10 +456,14 @@ function drawAudiogram() {
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
     
-    // Frekans etiketleri
-    for (let i = 0; i < freqs.length; i++) {
-        const x = padding + (width / (freqs.length - 1)) * i;
-        ctx.fillText(freqs[i] + ' Hz', x, canvas.height - padding + 20);
+    // Frekans etiketleri (sadece belirli frekanslar)
+    const displayFreqs = [500, 1000, 2000, 4000, 8000, 16000];
+    for (let i = 0; i < displayFreqs.length; i++) {
+        const freqIndex = freqs.indexOf(displayFreqs[i]);
+        if (freqIndex !== -1) {
+            const x = padding + (width / (freqs.length - 1)) * freqIndex;
+            ctx.fillText(displayFreqs[i] + ' Hz', x, canvas.height - padding + 20);
+        }
     }
     
     // dB etiketleri
@@ -608,15 +627,35 @@ document.addEventListener('DOMContentLoaded', () => {
         switchScreen('welcome');
     });
     
-    // Test ekranı butonları - Basit ve güvenilir
+    // Test ekranı butonları - İyileştirilmiş touch support
     const heardBtn = document.getElementById('heardBtn');
     const notHeardBtn = document.getElementById('notHeardBtn');
     
+    // Click listener
     heardBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         onHeard();
     });
     
+    // Touch listener (mobil için)
+    heardBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onHeard();
+    });
+    
+    // Click listener
     notHeardBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onNotHeard();
+    });
+    
+    // Touch listener (mobil için)
+    notHeardBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         onNotHeard();
     });
     
