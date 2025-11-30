@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İşitme Testi - Kulak Sagılığı Kontrolü</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Başlık Sayfası -->
+        <div id="welcomeScreen" class="screen active">
+            <div class="welcome-content">
+                <h1>👂 İşitme Testi</h1>
+                <p>Kulaklarınızın sağlığını profesyonel olarak kontrol edin</p>
+                
+                <div class="info-section">
+                    <h2>🎯 Test Hakkında</h2>
+                    <p>Bu test, kulağınızın <strong>farklı frekansları</strong> ne kadar iyi duyabıldığını profesyonel şekilde kontrol eder. Sağ ve sol kulağınız ayrı ayrı <strong>31 farklı frekans</strong> ile test edilecek, 40 Hz'e kadar düşük frekanslara sahip olacaksınız.</p>
+                    
+                    <div class="form-group">
+                        <label for="ageInput">📅 Yaşınız (zorunlu):</label>
+                        <input type="number" id="ageInput" min="1" max="120" value="30" placeholder="Yaşınızı girin">
+                    </div>
+                    
+                    <div class="frequency-info">
+                        <h3>📊 Test Kapsamı:</h3>
+                        <p>✅ <strong>31 frekans aralığı</strong>: 16.000 Hz - 40 Hz arası<br>
+                        ✅ <strong>Sol kulak testi</strong> + <strong>Sağ kulak testi</strong> (ayrı ayrı)<br>
+                        ✅ <strong>Yaşa uygun</strong> test parametreleri<br>
+                        ✅ <strong>Profesyonel audiogram</strong> grafiği<br>
+                        ✅ <strong>Odyolog/KBB tavsiyesi</strong></p>
+                    </div>
+                </div>
+                
+                <button id="startBtn" class="btn btn-primary">🚀 Teste Başla</button>
+                <button id="helpBtn" class="btn btn-secondary">📖 Talimatları Oku</button>
+            </div>
+        </div>
+
+        <!-- Talimatlı Sayfası -->
+        <div id="instructionsScreen" class="screen">
+            <div class="instructions-content">
+                <h2>📋 Detaylı Talimatlar</h2>
+                <div class="instructions-text">
+                    <h3>✅ Test Nasıl Yapılır?</h3>
+                    <ol>
+                        <li><strong>🎧 Kaliteli Kulaklık</strong> - Tele uygulaması kulaklık gereklidir (hoparlör ideal değildir)</li>
+                        <li><strong>🤫 Sessiz Ortam</strong> - Mümkün olduğunca sessiz bir yerde test yapınız</li>
+                        <li><strong>🔊 Ses Seviyesi</strong> - Rahat bir seviyeye ayarlayınız (yüksek ses kulaklarınıza zarar verebilir)</li>
+                        <li><strong>👂 Dikkat Et</strong> - Her sesin farkında olun ve duyup duymadığınızı işaretleyin</li>
+                        <li><strong>🎯 Doğru Kulak</strong> - Önce sağ kulak, sonra sol kulak test edilecek</li>
+                        <li><strong>⚡ Hızlı Yanıt</strong> - Sesin bitiminden önce yanıtlayın</li>
+                    </ol>
+
+                    <h3>📊 Sonuç Ne Olacak?</h3>
+                    <p>Test sonunda, kulaklarınızın her frekansda ne kadar iyi duyabıldığı gösterilecek. Eğer ciddi bir işitme kaybı varsa, <strong>Odyolog (İşitme Uzmanı)</strong> veya <strong>KBB Doktoru (Kulak Burun Boğaz Uzmanı)</strong> ziyareti önerilecek.</p>
+
+                    <h3>⚠️ ÖNEMLİ UYARILAR</h3>
+                    <p>
+                        🔴 <strong>Bu test profesyonel değildir!</strong> Gerçek audiometrik cihaz kadar doğru değildir.<br>
+                        🔴 <strong>Doktor yerine geçmez!</strong> Sonuçlarınızı doktorla mutlaka danışınız.<br>
+                        🔴 <strong>Tıbbi kararınız</strong> alırken bu testi tek başına kullanmayınız.<br>
+                        🟢 <strong>Başlangıç aracı</strong> olarak kullanılabilir.
+                    </p>
+                </div>
+                
+                <div class="button-group">
+                    <button id="backToWelcomeBtn" class="btn btn-secondary">← Geri</button>
+                    <button id="continueBtn" class="btn btn-primary">Devam Et →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doktor Uyarısı Modal -->
+        <div id="disclaimerModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>⚠️ ÖNEMLİ UYARI</h2>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Bu test, tıbbi tanı amaçlı değildir!</strong></p>
+                    
+                    <div class="warning-section">
+                        <h3>📋 Testin Amacı:</h3>
+                        <p>Bu uygulamada yapılan işitme testi, sadece <strong>tarama ve ön inceleme</strong> amaçlıdır. Profesyonel bir değerlendirme değildir.</p>
+                    </div>
+                    
+                    <div class="warning-section">
+                        <h3>👨‍⚕️ Doktor Konsültasyonu Zorunlu:</h3>
+                        <p>Işitme kaybı, işitme sorunu veya rahatsızlık yaşıyorsanız <strong>mutlaka bir Odyolog veya KBB doktoru</strong> ile görüşün.</p>
+                    </div>
+                    
+                    <div class="warning-section">
+                        <h3>📊 Test Hakkında:</h3>
+                        <ul>
+                            <li>Bu test 31 farklı frekansda yapılan basit bir ön inceleme testdir</li>
+                            <li>Profesyonel audiometrinin yerine geçmez</li>
+                            <li>Kesin tanı için mutlaka doktor önerisi alınız</li>
+                            <li>Sonuçlar sadece referans amaçlıdır</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="warning-section danger">
+                        <h3>🔴 Dikkat:</h3>
+                        <p><strong>Bu test sonucunun hiçbir tıbbi değeri yoktur.</strong> Herhangi bir karar vermeden önce mutlaka profesyonel tıbbi danışman alınız.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="closeDisclaimer" class="btn btn-primary">Anladım, Teste Başla 🎧</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Sayfası -->
+        <div id="testScreen" class="screen">
+            <div class="test-content">
+                <div class="test-header">
+                    <h2 id="testTitle">🎧 Sağ Kulak Testi</h2>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText">📍 Frekans: <span id="currentFreq">16000</span> Hz</p>
+                </div>
+
+                <div class="head-container">
+                    <svg id="headSvg" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <!-- Gradyanlar -->
+                            <linearGradient id="skinGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f5d5b8;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#d4a574;stop-opacity:1" />
+                            </linearGradient>
+                            
+                            <linearGradient id="earmuffsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#c41e3a;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#8b0000;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Boyun -->
+                        <rect x="135" y="210" width="50" height="60" fill="url(#skinGradient)" stroke="#c9a875" stroke-width="1.5" rx="8"/>
+                        
+                        <!-- Kafa (Başın ana kısmı) -->
+                        <circle cx="160" cy="130" r="75" fill="url(#skinGradient)" stroke="#c9a875" stroke-width="2"/>
+                        
+                        <!-- Yüz ön planı (Küçük circle overlay) -->
+                        <circle cx="160" cy="140" r="60" fill="url(#skinGradient)" stroke="none" opacity="0.3"/>
+                        
+                        <!-- Sol Kulak (Headphone) -->
+                        <g id="leftEar">
+                            <circle cx="75" cy="120" r="18" fill="url(#earmuffsGradient)" stroke="#5a0000" stroke-width="2"/>
+                            <circle cx="75" cy="120" r="12" fill="#2c1819" stroke="none"/>
+                            <circle cx="75" cy="120" r="8" fill="#1a1010" stroke="none" opacity="0.6"/>
+                        </g>
+                        
+                        <!-- Sağ Kulak (Headphone) -->
+                        <g id="rightEar">
+                            <circle cx="245" cy="120" r="18" fill="url(#earmuffsGradient)" stroke="#5a0000" stroke-width="2"/>
+                            <circle cx="245" cy="120" r="12" fill="#2c1819" stroke="none"/>
+                            <circle cx="245" cy="120" r="8" fill="#1a1010" stroke="none" opacity="0.6"/>
+                        </g>
+                        
+                        <!-- Headband Çubuğu -->
+                        <path d="M 85 75 Q 160 30 235 75" stroke="#8b4513" stroke-width="6" fill="none" stroke-linecap="round"/>
+                        <path d="M 85 75 Q 160 35 235 75" stroke="#a0522d" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+                        
+                        <!-- Gözler -->
+                        <circle cx="130" cy="110" r="7" fill="#2c3e50" stroke="#1a1a1a" stroke-width="1"/>
+                        <circle cx="130" cy="108" r="3" fill="white" opacity="0.8"/>
+                        
+                        <circle cx="190" cy="110" r="7" fill="#2c3e50" stroke="#1a1a1a" stroke-width="1"/>
+                        <circle cx="190" cy="108" r="3" fill="white" opacity="0.8"/>
+                        
+                        <!-- Eyebrows -->
+                        <path d="M 120 95 Q 130 90 140 95" stroke="#8b6914" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <path d="M 180 95 Q 190 90 200 95" stroke="#8b6914" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        
+                        <!-- Burun -->
+                        <path d="M 160 115 L 155 140 L 160 142 L 165 140 Z" fill="#d4a574" stroke="#c9a875" stroke-width="1"/>
+                        <circle cx="153" cy="142" r="2.5" fill="#b08968" opacity="0.7"/>
+                        <circle cx="167" cy="142" r="2.5" fill="#b08968" opacity="0.7"/>
+                        
+                        <!-- Ağız (Gülüş) -->
+                        <path d="M 135 165 Q 160 185 185 165" stroke="#b85c5c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        
+                        <!-- Ağız dolgusu (Hafif) -->
+                        <path d="M 135 165 Q 160 178 185 165" fill="#f0c8c8" opacity="0.4"/>
+                        
+                        <!-- Yanaklar (Blush) -->
+                        <circle cx="110" cy="145" r="12" fill="#d4949f" opacity="0.4"/>
+                        <circle cx="210" cy="145" r="12" fill="#d4949f" opacity="0.4"/>
+                        
+                        <!-- Saç (Üst) -->
+                        <path d="M 90 80 Q 160 20 230 80" fill="#4a3728" stroke="#3a2818" stroke-width="1"/>
+                        <path d="M 90 80 Q 160 40 230 80" fill="#6b5437" opacity="0.5"/>
+                        
+                        <!-- Saç detayları (Sol) -->
+                        <path d="M 95 90 Q 100 60 110 85" stroke="#4a3728" stroke-width="1.5" fill="none" opacity="0.6"/>
+                        <path d="M 105 85 Q 110 55 120 85" stroke="#4a3728" stroke-width="1.5" fill="none" opacity="0.6"/>
+                        
+                        <!-- Saç detayları (Sağ) -->
+                        <path d="M 225 90 Q 220 60 210 85" stroke="#4a3728" stroke-width="1.5" fill="none" opacity="0.6"/>
+                        <path d="M 215 85 Q 210 55 200 85" stroke="#4a3728" stroke-width="1.5" fill="none" opacity="0.6"/>
+                        
+                        <!-- Çene detayı -->
+                        <path d="M 100 190 Q 160 210 220 190" stroke="#c9a875" stroke-width="1" fill="none" opacity="0.5"/>
+                    </svg>
+                </div>
+
+                <div class="test-controls">
+                    <div class="sound-indicator">
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="heardBtn" class="btn btn-success">✅ Sesi Duydum</button>
+                        <button id="notHeardBtn" class="btn btn-danger">❌ Sesi Duymadım</button>
+                    </div>
+                    
+                    <button id="pauseBtn" class="btn btn-secondary">⏸️ Durdur</button>
+                </div>
+
+                <div class="ear-indicator">
+                    <p id="earInfo">🎧 Sağ kulak test ediliyor...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sonuç Sayfası -->
+        <div id="resultsScreen" class="screen">
+            <div class="results-content">
+                <h2>📊 Test Sonuçlarınız</h2>
+                
+                <div class="results-container">
+                    <div class="ear-result">
+                        <h3>👂 Sağ Kulak</h3>
+                        <div id="rightEarResults" class="result-text"></div>
+                    </div>
+                    
+                    <div class="ear-result">
+                        <h3>👂 Sol Kulak</h3>
+                        <div id="leftEarResults" class="result-text"></div>
+                    </div>
+                </div>
+
+                <div class="audiogram">
+                    <h3>📈 İşitme Grafiği (Audiogram)</h3>
+                    <canvas id="audiogramChart" width="600" height="400"></canvas>
+                </div>
+
+                <div id="recommendationBox" class="recommendation-box">
+                    <h3>👨‍⚕️ Doktor Ziyareti Tavsiyesi</h3>
+                    <p id="recommendationText"></p>
+                </div>
+
+                <div class="button-group">
+                    <button id="restartBtn" class="btn btn-primary">🔄 Tekrar Test Et</button>
+                    <button id="downloadBtn" class="btn btn-secondary">⬇️ Sonuçları İndir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
