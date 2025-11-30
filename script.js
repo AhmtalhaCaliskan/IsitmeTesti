@@ -37,7 +37,9 @@ let state = {
     audioContext: null,
     oscillator: null,
     gainNode: null,
-    isWaitingForResponse: false // ← YENİ: Buton tıklama beklemesini kontrol et
+    isWaitingForResponse: false,
+    lastResponseTime: 0, // ← YENİ: Son cevap zamanı
+    minResponseDelay: 100 // ← YENİ: Minimum cevap arası (ms)
 };
 
 // Web Audio API başlatıcı
@@ -152,7 +154,8 @@ function startTest() {
     state.currentEar = 'right';
     state.testResults = { right: {}, left: {} };
     state.testStarted = true;
-    state.isWaitingForResponse = false; // ← Reset flag
+    state.isWaitingForResponse = false;
+    state.lastResponseTime = 0; // ← RESET: Timestamp'i sıfırla
     
     switchScreen('test');
     runTest();
@@ -217,22 +220,32 @@ function updateTestUI() {
     document.getElementById('progressFill').style.width = progress + '%';
 }
 
-// Kullanıcı "Duydum" butonuna basıyor - İyileştirilmiş
+// Kullanıcı "Duydum" butonuna basıyor - GARANTILI ÇALIŞMA
 function onHeard() {
-    // Eğer test devam etmiyorsa veya test başlamadıysa yoksay
+    const now = Date.now();
+    
+    // Test devam etmiyorsa veya başlamadıysa yoksay
     if (state.isPaused || !state.testStarted) {
         return;
     }
     
-    // Eğer ses hala çalmıyorsa ve beklenmiyorsa bu klik hiçbir şey yapmaz
+    // Çok hızlı art arda basılmışsa yoksay (100ms kuralı)
+    if (now - state.lastResponseTime < state.minResponseDelay) {
+        return;
+    }
+    
+    // Sesin çalmadığı ve beklenilmediği durumda yoksay
     if (!state.isPlaying && !state.isWaitingForResponse) {
         return;
     }
     
-    // Eğer zaten bu frekansı işlediyse yoksay
+    // Zaten bu frekansı işlediyse yoksay
     if (state.isWaitingForResponse) {
         return;
     }
+    
+    // Son cevap zamanını güncelle
+    state.lastResponseTime = now;
     
     // Beklemede olduğunu işaretle
     state.isWaitingForResponse = true;
@@ -251,7 +264,7 @@ function onHeard() {
     heardBtn.style.pointerEvents = 'none';
     notHeardBtn.style.pointerEvents = 'none';
     
-    // Sonraki teste geç
+    // Hızlı sonraki teste geç
     setTimeout(() => {
         heardBtn.style.opacity = '1';
         heardBtn.style.pointerEvents = 'auto';
@@ -261,20 +274,30 @@ function onHeard() {
         if (!state.isPaused) {
             runTest();
         }
-    }, 300);
+    }, 250);
 }
 
-// Kullanıcı "Duymadım" butonuna basıyor
+// Kullanıcı "Duymadım" butonuna basıyor - GARANTILI ÇALIŞMA
 function onNotHeard() {
-    // Eğer test devam etmiyorsa veya test başlamadıysa yoksay
+    const now = Date.now();
+    
+    // Test devam etmiyorsa veya başlamadıysa yoksay
     if (state.isPaused || !state.testStarted) {
         return;
     }
     
-    // Eğer zaten bu frekansı işlediyse yoksay
+    // Çok hızlı art arda basılmışsa yoksay (100ms kuralı)
+    if (now - state.lastResponseTime < state.minResponseDelay) {
+        return;
+    }
+    
+    // Zaten bu frekansı işlediyse yoksay
     if (state.isWaitingForResponse) {
         return;
     }
+    
+    // Son cevap zamanını güncelle
+    state.lastResponseTime = now;
     
     // Beklemede olduğunu işaretle
     state.isWaitingForResponse = true;
@@ -295,7 +318,7 @@ function onNotHeard() {
     heardBtn.style.pointerEvents = 'none';
     notHeardBtn.style.pointerEvents = 'none';
     
-    // Sonraki teste geç
+    // Hızlı sonraki teste geç
     setTimeout(() => {
         notHeardBtn.style.opacity = '1';
         heardBtn.style.pointerEvents = 'auto';
@@ -305,7 +328,7 @@ function onNotHeard() {
         if (!state.isPaused) {
             runTest();
         }
-    }, 300);
+    }, 250);
 }
 
 // Sonuçları göster
