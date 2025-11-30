@@ -558,43 +558,245 @@ function drawEarLine(ctx, results, padding, width, height, freqs, color, symbol)
     }
 }
 
-// Sonuçları indir
+// PDF olarak sonuçları indir
 function downloadResults() {
-    const ageGroup = getAgeGroup(state.age);
     const timestamp = new Date().toLocaleString('tr-TR');
+    const age = state.age;
+    const ageGroup = getAgeGroup(age);
     
-    let content = `İŞİTME TESTİ SONUÇLARI\n`;
-    content += `======================\n\n`;
-    content += `Test Tarihi: ${timestamp}\n`;
-    content += `Yaş: ${state.age}\n`;
-    content += `Yaş Grubu: ${ageGroup}\n\n`;
+    // Sonuçları analiz et
+    const rightEarResults = formatResults(state.testResults.right, age, ageGroup);
+    const leftEarResults = formatResults(state.testResults.left, age, ageGroup);
     
-    content += `SAĞ KULAK SONUÇLARI:\n`;
-    content += `------------------\n`;
-    for (const [freq, heard] of Object.entries(state.testResults.right)) {
-        content += `${freq} Hz: ${heard ? 'Duyuldu' : 'Duymadı'}\n`;
+    // PDF içeriği oluştur
+    const pdfContent = `
+    <div style="font-family: Arial, sans-serif; padding: 30px; color: #333; line-height: 1.6;">
+        <!-- Başlık -->
+        <div style="text-align: center; border-bottom: 3px solid #1e40af; padding-bottom: 20px; margin-bottom: 30px;">
+            <h1 style="margin: 0; color: #1e40af; font-size: 28px;">👂 İŞİTME TESTİ SONUÇLARI</h1>
+            <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Profesyonel İşitme Değerlendirmesi</p>
+        </div>
+        
+        <!-- Test Bilgileri -->
+        <div style="background: #f0f7ff; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #1e40af;">
+            <h3 style="margin-top: 0; color: #1e40af;">📋 Test Bilgileri</h3>
+            <table style="width: 100%; font-size: 14px;">
+                <tr>
+                    <td style="padding: 5px; font-weight: bold; width: 30%;">Test Tarihi:</td>
+                    <td style="padding: 5px;">${timestamp}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; font-weight: bold;">Katılımcı Yaşı:</td>
+                    <td style="padding: 5px;">${age} yaş</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; font-weight: bold;">Yaş Grubu:</td>
+                    <td style="padding: 5px;">${ageGroup}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; font-weight: bold;">Test Frekansları:</td>
+                    <td style="padding: 5px;">31 frekans aralığı (40 Hz - 16000 Hz)</td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- Sağ Kulak Sonuçları -->
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #059669;">
+            <h3 style="margin-top: 0; color: #059669;">👂 SAĞ KULAK SONUÇLARI</h3>
+            <div style="font-size: 14px; line-height: 1.8;">
+                ${rightEarResults.html}
+            </div>
+        </div>
+        
+        <!-- Sol Kulak Sonuçları -->
+        <div style="background: #f8d7da; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #dc2626;">
+            <h3 style="margin-top: 0; color: #dc2626;">👂 SOL KULAK SONUÇLARI</h3>
+            <div style="font-size: 14px; line-height: 1.8;">
+                ${leftEarResults.html}
+            </div>
+        </div>
+        
+        <!-- Audiogram Grafiği -->
+        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 2px solid #e5e7eb; text-align: center;">
+            <h3 style="margin-top: 0; color: #1e40af;">📊 AUDIOGRAM GRAFİĞİ</h3>
+            <canvas id="pdfAudiogramChart" width="600" height="400" style="max-width: 100%;"></canvas>
+        </div>
+        
+        <!-- Öneriler -->
+        <div id="pdfRecommendation" style="padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid;">
+            <h3 style="margin-top: 0;">👨‍⚕️ UZMAN TAVSIYELERI</h3>
+            <div style="font-size: 14px; line-height: 1.8; white-space: pre-wrap;"></div>
+        </div>
+        
+        <!-- Önemli Uyarılar -->
+        <div style="background: #fef2f2; padding: 15px; border-radius: 8px; border-left: 4px solid #dc2626;">
+            <h3 style="margin-top: 0; color: #dc2626;">⚠️ ÖNEMLİ UYARILAR</h3>
+            <ul style="margin: 10px 0; padding-left: 20px; font-size: 13px;">
+                <li><strong>Bu test profesyonel değildir:</strong> Gerçek audiometrik cihaz kadar doğru değildir.</li>
+                <li><strong>Doktor yerine geçmez:</strong> Sonuçları mutlaka bir Odyolog veya KBB Doktoru ile paylaşınız.</li>
+                <li><strong>Tıbbi karar alınırken:</strong> Bu testi tek başına kullanmayınız. Her zaman profesyonel danışman alınız.</li>
+                <li><strong>Doktor ziyareti:</strong> İşitme kaybı şüphesi varsa en kısa sürede uzman doktor ile görüşün.</li>
+            </ul>
+        </div>
+        
+        <!-- Alt Bilgi -->
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 12px; color: #666;">
+            <p style="margin: 5px 0;">Bu rapor <strong>IsitmeTesti.com</strong> platformu tarafından oluşturulmuştur.</p>
+            <p style="margin: 5px 0;">Rapor Oluşturma Tarihi: ${new Date().toLocaleString('tr-TR')}</p>
+            <p style="margin: 5px 0; font-style: italic;">Bu belge gizlidir ve özel olarak sizin için oluşturulmuştur.</p>
+        </div>
+    </div>
+    `;
+    
+    // HTML'yi DOM'a ekle
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = pdfContent;
+    tempDiv.style.display = 'none';
+    document.body.appendChild(tempDiv);
+    
+    // Audiogram grafiğini çiz
+    const pdfCanvas = tempDiv.querySelector('#pdfAudiogramChart');
+    drawAudiogramForPDF(pdfCanvas);
+    
+    // Önerileri ekle
+    const recommendation = generateRecommendation(rightEarResults, leftEarResults, age);
+    const recBox = tempDiv.querySelector('#pdfRecommendation');
+    recBox.classList.add('recommendation-box', recommendation.level);
+    recBox.style.borderLeftColor = 
+        recommendation.level === 'danger' ? '#dc2626' :
+        recommendation.level === 'warning' ? '#f59e0b' : '#059669';
+    recBox.style.background = 
+        recommendation.level === 'danger' ? '#fef2f2' :
+        recommendation.level === 'warning' ? '#fffbeb' : '#ecfdf5';
+    recBox.querySelector('div').textContent = recommendation.text;
+    
+    // PDF oluştur
+    const element = tempDiv;
+    const opt = {
+        margin: 10,
+        filename: `IsitmeTest_Sonuclari_${Date.now()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+    
+    html2pdf().set(opt).from(element).save().then(() => {
+        // TempDiv'i sil
+        document.body.removeChild(tempDiv);
+    });
+}
+
+// PDF için Audiogram çiz
+function drawAudiogramForPDF(canvas) {
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const padding = 50;
+    const width = canvas.width - padding * 2;
+    const height = canvas.height - padding * 2;
+    
+    // Canvas temizle
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Grid çiz
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    
+    // Yatay çizgiler
+    for (let i = 0; i <= 5; i++) {
+        const y = padding + (height / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(canvas.width - padding, y);
+        ctx.stroke();
     }
     
-    content += `\nSOL KULAK SONUÇLARI:\n`;
-    content += `------------------\n`;
-    for (const [freq, heard] of Object.entries(state.testResults.left)) {
-        content += `${freq} Hz: ${heard ? 'Duyuldu' : 'Duymadı'}\n`;
+    // Dikey çizgiler
+    const freqs = state.frequencies;
+    for (let i = 0; i < freqs.length; i++) {
+        const x = padding + (width / (freqs.length - 1)) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, padding);
+        ctx.lineTo(x, canvas.height - padding);
+        ctx.stroke();
     }
     
-    content += `\n\nÖNEMLİ NOT:\n`;
-    content += `Bu test profesyonel tıbbi teşhis yerine geçmez.\n`;
-    content += `Sonuçlarınızı bir audioloğu veya ENT doktoruyla paylaşınız.\n`;
+    // Eksenler
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
     
-    // İndir
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `IsitmeTest_${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    // Y ekseni
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, canvas.height - padding);
+    ctx.stroke();
+    
+    // X ekseni
+    ctx.beginPath();
+    ctx.moveTo(padding, canvas.height - padding);
+    ctx.lineTo(canvas.width - padding, canvas.height - padding);
+    ctx.stroke();
+    
+    // Etiketler
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    
+    // Frekans etiketleri
+    const displayFreqs = [500, 1000, 2000, 4000, 8000, 16000];
+    for (let i = 0; i < displayFreqs.length; i++) {
+        const freqIndex = freqs.indexOf(displayFreqs[i]);
+        if (freqIndex !== -1) {
+            const x = padding + (width / (freqs.length - 1)) * freqIndex;
+            ctx.fillText(displayFreqs[i] + ' Hz', x, canvas.height - padding + 18);
+        }
+    }
+    
+    // dB etiketleri
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 5; i++) {
+        const y = padding + (height / 5) * i;
+        const db = 25 - (i * 5);
+        ctx.fillText(db + ' dB', padding - 10, y + 5);
+    }
+    
+    // Başlık
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Audiogram Grafiği', canvas.width / 2, 25);
+    
+    // Y ekseni etiketi
+    ctx.save();
+    ctx.translate(15, canvas.height / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('İşitme Seviyesi (dB HL)', 0, 0);
+    ctx.restore();
+    
+    // X ekseni etiketi
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Frekans (Hz)', canvas.width / 2, canvas.height - 5);
+    
+    // Verileri çiz
+    drawEarLine(ctx, state.testResults.right, padding, width, height, freqs, '#2563eb', 'o');
+    drawEarLine(ctx, state.testResults.left, padding, width, height, freqs, '#ef4444', 'x');
+    
+    // Legend
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'left';
+    
+    ctx.fillStyle = '#2563eb';
+    ctx.fillRect(canvas.width - 160, 20, 12, 12);
+    ctx.fillStyle = '#333';
+    ctx.fillText('Sağ Kulak', canvas.width - 143, 28);
+    
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(canvas.width - 160, 38, 12, 12);
+    ctx.fillStyle = '#333';
+    ctx.fillText('Sol Kulak', canvas.width - 143, 46);
 }
 
 // Event Listeners
